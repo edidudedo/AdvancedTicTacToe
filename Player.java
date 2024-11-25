@@ -3,10 +3,10 @@ public class Player {
     TileVal tileVal;
     char mark;
 
-    public Player(PlayerVal _order, TileVal _tileVal){
-        order = _order;
+    public Player(PlayerVal _playerVal, TileVal _tileVal, char _mark){
+        order = _playerVal;
         tileVal = _tileVal;
-        mark = (order == PlayerVal.FIRST) ? 'X' : 'O';
+        mark = _mark;
     }
 
     public void setMark(char newMark){

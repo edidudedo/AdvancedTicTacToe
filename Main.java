@@ -1,21 +1,8 @@
-// IMPROVEMENTS
-/// (DONE) Change the reduce Health from O(n2) of TC to O(n) of SC 
-/// (DONE) Add Setting for this attributes : 
-//// GridSize
-//// Player1 mark
-//// Player2 mark
-/// (Done) No need to print the grid when the input is wrong
-/// (Done) tile.getValue should be TileVal and not String (String should only be during the print
-/// (Done) Change output from O(n2) to O(1)
-
 import java.util.Scanner;
 
 class Main{
     public static void main(String args[]){
-        // Initialization 
-        /// TC = O(n2)
-        /// SC = O(n2)
-        TicTacToe tictactoe = new TicTacToe();
+        // Scanner Initialization 
         Scanner scanner = new Scanner(System.in);
 
         // PrintRule
@@ -24,9 +11,14 @@ class Main{
         printRule();
 
         // Setting
-        /// TC = O(l + n2)
+        /// TC = O(l)
+        /// SC = O(1)
+        SettingInput settingInput = setting(scanner);
+
+        // tictactoe initialization
+        /// TC = O(n2)
         /// SC = O(n2)
-        setting(tictactoe, scanner);
+        TicTacToe tictactoe = new TicTacToe(settingInput.gridSize, settingInput.player1Mark, settingInput.player2Mark);
 
         // Game
         /// TC = O(k(n+l))
@@ -48,60 +40,61 @@ class Main{
         System.out.println("");
     }
 
-    static private void setting(TicTacToe tictactoe, Scanner scanner){
+    static private SettingInput setting(Scanner scanner){
+        SettingInput ret = null;
         do{
             System.out.println("Set the Setting (Input format : GRIDSIZE Player1Mark Player2Mark) : ") ;
             String settingInput = scanner.nextLine(); 
-
-            if(checkUserSettingInput(tictactoe, settingInput)){
-                break;
-            }
-        }while(true);
+            ret = checkUserSettingInput(settingInput);
+        }while(ret == null);
+        return ret;
     }
 
-    static private boolean checkUserSettingInput(TicTacToe tictactoe, String input){
+    static private SettingInput checkUserSettingInput(String input){
         int gridSize = 0;
         char player1Mark = 'X';
         char player2Mark = 'O';
         String[] words = input.trim().split("\\s+");
         if(words.length != 3){
             System.out.println("Wrong Number of Inputs");
-            return false;
+            return null;
         }
         try{
             gridSize = Integer.parseInt(words[0]);
         }catch(Exception e){
             System.out.println("Grid size is not an integer");
-            return false;
+            return null;
         }
         if(gridSize < 3 || gridSize > 5){
             System.out.println("Grid size should be 3 to 5");
-            return false;
+            return null;
         } 
         if(words[1].length() != 1) {
             System.out.println("Player 1 mark is not a char");
-            return false;
+            return null;
         }
         player1Mark = words[1].charAt(0);
         if(player1Mark == '#'){
             System.out.println("Player 1 mark cannot be default mark #");
-            return false;
+            return null;
         }
 
         if(words[2].length() != 1) {
             System.out.println("Player 2 mark is not a char");
-            return false;
+            return null;
         }
         player2Mark = words[2].charAt(0);
         if(player2Mark == '#'){
             System.out.println("Player 2 mark cannot be default mark #");
-            return false;
+            return null;
         }
 
-        tictactoe.changeGridSize(gridSize);
-        tictactoe.changePlayerMark(0, player1Mark);
-        tictactoe.changePlayerMark(1, player2Mark);
-        return true;
+        if(player1Mark == player2Mark) {
+            System.out.println("Marks cannot be the same");
+            return null;
+        }
+
+        return new SettingInput(gridSize, player1Mark, player2Mark);
     }
 
     static private int game(TicTacToe tictactoe, Scanner scanner){

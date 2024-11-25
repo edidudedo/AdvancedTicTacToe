@@ -10,13 +10,14 @@ public class TicTacToe {
     private int curPlayerIndex;
     private StringBuilder gridSB;
 
-    public TicTacToe(){
-        resetGrid();
-        resetPlayers();
+    public TicTacToe(int gridSize, char p1, char p2){
+        resetGrid(gridSize);
+        resetPlayers(p1, p2);
         resetPlayerMoves();
         resetGridSB();
     }
-    private void resetGrid(){
+    private void resetGrid(int gridSize){
+        changeGridSize(gridSize);
         grid = new Tile[GRIDSIZE][GRIDSIZE];
         for(int i = 0;i<GRIDSIZE;i++){
             for(int j = 0;j<GRIDSIZE;j++){
@@ -26,10 +27,10 @@ public class TicTacToe {
 
     }
 
-    private void resetPlayers(){
+    private void resetPlayers(char p1, char p2){
         players = new Player[2];
-        players[0] = new Player(PlayerVal.FIRST, TileVal.FIRST);
-        players[1] = new Player(PlayerVal.SECOND, TileVal.SECOND);
+        players[0] = new Player(PlayerVal.FIRST, TileVal.FIRST, p1);
+        players[1] = new Player(PlayerVal.SECOND, TileVal.SECOND, p2);
         curPlayerIndex = 0;
     }
 
@@ -133,8 +134,6 @@ public class TicTacToe {
 
     public void changeGridSize(int newGridSize){
         GRIDSIZE = newGridSize;
-        resetGrid();
-        resetGridSB();
     }
 
     public int checkWonPlayer(){
