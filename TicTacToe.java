@@ -1,19 +1,26 @@
+import java.util.Deque;
+import java.util.ArrayDeque;
+import java.util.List;
+import java.util.ArrayList;
 public class TicTacToe {
-    static private int GRIDSIZE = 4;
+    static private int GRIDSIZE = 3;
     private Tile[][] grid;
     private Player[] players;
+    private List<Deque<Tile>> playerMoves = new ArrayList<>();
     private int curPlayerIndex;
+    private StringBuilder gridSB;
 
     public TicTacToe(){
         resetGrid();
         resetPlayers();
-        
+        resetPlayerMoves();
+        resetGridSB();
     }
     private void resetGrid(){
         grid = new Tile[GRIDSIZE][GRIDSIZE];
         for(int i = 0;i<GRIDSIZE;i++){
             for(int j = 0;j<GRIDSIZE;j++){
-                grid[i][j] = new Tile(TileVal.EMPTY, GRIDSIZE*2);
+                grid[i][j] = new Tile(TileVal.EMPTY, GRIDSIZE*2, i, j);
             }
         }
 
@@ -26,13 +33,55 @@ public class TicTacToe {
         curPlayerIndex = 0;
     }
 
+    private void resetPlayerMoves(){
+        Deque<Tile> player1Moves = new ArrayDeque<>();
+        Deque<Tile> player2Moves = new ArrayDeque<>();
+        playerMoves.add(player1Moves);
+        playerMoves.add(player2Moves);
+    }
+
+    private void resetGridSB(){
+        gridSB = new StringBuilder();
+        gridSB.append("  ");
+        for(int i = 0;i<GRIDSIZE;i++){
+            gridSB.append("" + (i+1) + " ");
+        }
+        gridSB.append("\n");
+        for(int i = 0;i<GRIDSIZE;i++){
+            gridSB.append((char)('A' + i) + " ");
+            for(int j = 0;j<GRIDSIZE;j++){
+                gridSB.append( "# ");
+            }
+            gridSB.append("\n");
+        }
+    }
+
     public void switchPlayers(){
         curPlayerIndex = 1-curPlayerIndex;
     }
 
     public boolean curPlayerPlay(int i, int j){
         Player curPlayer = players[curPlayerIndex];
-        return curPlayer.makeMove(grid, i, j);
+        
+        if(!curPlayer.makeMove(grid, i, j)){
+            return false;
+        }
+        Deque<Tile> curPlayerMoves = playerMoves.get(curPlayerIndex);
+        curPlayerMoves.addLast(grid[i][j]);
+        changeGridSB(i, j, curPlayer.mark);
+        return true;
+    }
+
+    private void changeGridSB(int i, int j, char mark){
+        gridSB.setCharAt(findIndexInSB(i, j), mark);
+    }
+
+    public void changePlayerMark(int playerIndex, char playerMark){
+        players[playerIndex].setMark(playerMark);
+    }
+
+    private int findIndexInSB(int i, int j){
+        return (i+1)*(2*(GRIDSIZE+1)+1) + 2*(j+1);
     }
 
     public void debug(){
@@ -44,11 +93,14 @@ public class TicTacToe {
         }
     }
 
-    public void reduceHealth(){
-        for(int i = 0;i< GRIDSIZE;i++){
-            for(int j = 0; j<GRIDSIZE;j++){
-                grid[i][j].reduceHealth();
-            }
+    public void checkBoard(){
+        Deque<Tile> curPlayerMoves = playerMoves.get(curPlayerIndex);
+        if(curPlayerMoves.size() >= GRIDSIZE){
+            Tile curTile = curPlayerMoves.removeFirst();
+            curTile.resetValue();
+            int[] curTileCoordinate = curTile.getCoordinate();
+            changeGridSB(curTileCoordinate[0], curTileCoordinate[1], '#');
+            
         }
     }
 
@@ -67,6 +119,10 @@ public class TicTacToe {
         }
     }
 
+    public void printGridSB(){
+        System.out.print(gridSB.toString());
+    }
+
     public int getCurPlayer(){
         return curPlayerIndex+1;
     }
@@ -75,20 +131,26 @@ public class TicTacToe {
         return GRIDSIZE;
     }
 
+    public void changeGridSize(int newGridSize){
+        GRIDSIZE = newGridSize;
+        resetGrid();
+        resetGridSB();
+    }
+
     public int checkWonPlayer(){
         // Check Vertically 
         for(int i = 0;i<GRIDSIZE;i++){
-            String winningTile = "";
+            TileVal winningTile = TileVal.EMPTY;
             boolean isWinnerDecided = true;
             for(int j = 0;j<GRIDSIZE;j++){
-                String tileValue = grid[i][j].getValue();
+                TileVal tileValue = grid[i][j].getValue();
                 
-                if(tileValue == "#"){
+                if(tileValue == TileVal.EMPTY){
                     isWinnerDecided = false;
                     break;
                 }
 
-                if(winningTile ==  "") {
+                if(winningTile ==  TileVal.EMPTY) {
                     winningTile = tileValue;
                 }
                 else{
@@ -100,22 +162,22 @@ public class TicTacToe {
 
             }
             if (isWinnerDecided){
-                return (winningTile == "O") ? 2 : 1;
+                return (winningTile == TileVal.SECOND) ? 2 : 1;
             }
         }
         // horizontally
         for(int i = 0;i<GRIDSIZE;i++){
-            String winningTile = "";
+            TileVal winningTile = TileVal.EMPTY;
             boolean isWinnerDecided = true;
             for(int j = 0;j<GRIDSIZE;j++){
-                String tileValue = grid[j][i].getValue();
+                TileVal tileValue = grid[j][i].getValue();
                 
-                if(tileValue == "#"){
+                if(tileValue == TileVal.EMPTY){
                     isWinnerDecided = false;
                     break;
                 }
 
-                if(winningTile ==  "") {
+                if(winningTile ==  TileVal.EMPTY) {
                     winningTile = tileValue;
                 }
                 else{
@@ -127,24 +189,23 @@ public class TicTacToe {
 
             }
             if (isWinnerDecided){
-                return (winningTile == "O") ? 2 : 1;
+                return (winningTile == TileVal.SECOND) ? 2 : 1;
             }
         }
 
         // Diagonal 1
-
-        String winningTile = "";
+        TileVal winningTile = TileVal.EMPTY;
         boolean isWinnerDecided = true;
 
         for(int i = 0;i<GRIDSIZE;i++){
-            String tileValue = grid[i][i].getValue();
+            TileVal tileValue = grid[i][i].getValue();
                 
-            if(tileValue == "#"){
+            if(tileValue == TileVal.EMPTY){
                 isWinnerDecided = false;
                 break;
             }
 
-            if(winningTile ==  "") {
+            if(winningTile ==  TileVal.EMPTY) {
                 winningTile = tileValue;
             }
             else{
@@ -156,23 +217,22 @@ public class TicTacToe {
         }
 
         if (isWinnerDecided){
-            return (winningTile == "O") ? 2 : 1;
+            return (winningTile == TileVal.SECOND) ? 2 : 1;
         }
 
-        // Diagonal 1
-
-        winningTile = "";
+        // Diagonal 2
+        winningTile = TileVal.EMPTY;
         isWinnerDecided = true;
 
         for(int i = 0;i<GRIDSIZE;i++){
-            String tileValue = grid[GRIDSIZE-1-i][i].getValue();
+            TileVal tileValue = grid[GRIDSIZE-1-i][i].getValue();
                 
-            if(tileValue == "#"){
+            if(tileValue == TileVal.EMPTY){
                 isWinnerDecided = false;
                 break;
             }
 
-            if(winningTile ==  "") {
+            if(winningTile ==  TileVal.EMPTY) {
                 winningTile = tileValue;
             }
             else{
@@ -184,12 +244,8 @@ public class TicTacToe {
         }
 
         if (isWinnerDecided){
-            return (winningTile == "O") ? 2 : 1;
+            return (winningTile == TileVal.SECOND) ? 2 : 1;
         }
-
-        // diagonally 
         return 0;
     }
-
-    
 }
