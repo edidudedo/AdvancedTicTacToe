@@ -18,3 +18,11 @@
 ## Class Diagram
 ![AdvancedTicTacToe drawio](https://github.com/user-attachments/assets/23d822d4-14ff-409d-af66-021743062890)
 
+## Complexity 
+- TC = O(n^2 + nk)
+- SC = O(n^2)
+
+For :
+- n = the size of the board
+- k = the number of turns in total for one game
+
