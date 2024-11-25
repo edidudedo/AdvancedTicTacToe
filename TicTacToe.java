@@ -16,15 +16,15 @@ public class TicTacToe {
         resetPlayerMoves();
         resetGridSB();
     }
+
     private void resetGrid(int gridSize){
-        changeGridSize(gridSize);
+        GRIDSIZE = gridSize;
         grid = new Tile[GRIDSIZE][GRIDSIZE];
         for(int i = 0;i<GRIDSIZE;i++){
             for(int j = 0;j<GRIDSIZE;j++){
                 grid[i][j] = new Tile(TileVal.EMPTY, GRIDSIZE*2, i, j);
             }
         }
-
     }
 
     private void resetPlayers(char p1, char p2){
@@ -77,10 +77,6 @@ public class TicTacToe {
         gridSB.setCharAt(findIndexInSB(i, j), mark);
     }
 
-    public void changePlayerMark(int playerIndex, char playerMark){
-        players[playerIndex].setMark(playerMark);
-    }
-
     private int findIndexInSB(int i, int j){
         return (i+1)*(2*(GRIDSIZE+1)+1) + 2*(j+1);
     }
@@ -101,22 +97,6 @@ public class TicTacToe {
             curTile.resetValue();
             int[] curTileCoordinate = curTile.getCoordinate();
             changeGridSB(curTileCoordinate[0], curTileCoordinate[1], '#');
-            
-        }
-    }
-
-    public void printGrid(){
-        System.out.print("  ");
-        for(int i = 0;i<GRIDSIZE;i++){
-            System.out.print("" + (i+1) + " ");
-        }
-        System.out.println("");
-        for(int i = 0;i<GRIDSIZE;i++){
-            System.out.print((char)('A' + i) + " ");
-            for(int j = 0;j<GRIDSIZE;j++){
-                System.out.print("" + grid[i][j].getValue() + " ");
-            }
-            System.out.println("");
         }
     }
 
@@ -130,10 +110,6 @@ public class TicTacToe {
 
     public int getGridSize(){
         return GRIDSIZE;
-    }
-
-    public void changeGridSize(int newGridSize){
-        GRIDSIZE = newGridSize;
     }
 
     public int checkWonPlayer(){
