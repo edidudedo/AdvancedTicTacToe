@@ -27,6 +27,6 @@ For :
 - k = the number of turns in total for one game
 
 ## Youtube
-Please check the link below : 
+Please check the link : 
 https://www.youtube.com/watch?v=sskbJyYeuO8
 
