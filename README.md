@@ -26,3 +26,7 @@ For :
 - n = the size of the board
 - k = the number of turns in total for one game
 
+## Youtube
+Please check the link below : 
+https://www.youtube.com/watch?v=sskbJyYeuO8
+
